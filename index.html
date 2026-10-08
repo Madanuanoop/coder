@@ -1,1001 +1,1733 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>CodeForge Studio - Online Compiler</title>
+
+<meta name="theme-color" content="#0b1020">
+
+<style>
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family:
+        Inter,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif;
+
+    min-height: 100vh;
+    color: #e5e7eb;
+
+    background:
+        radial-gradient(circle at 10% 10%, rgba(99,102,241,.18), transparent 28%),
+        radial-gradient(circle at 90% 20%, rgba(6,182,212,.15), transparent 25%),
+        radial-gradient(circle at 50% 100%, rgba(168,85,247,.14), transparent 30%),
+        #060914;
+
+    overflow-x: hidden;
+}
+
+/* Animated background */
+
+body::before,
+body::after {
+    content: "";
+    position: fixed;
+    width: 420px;
+    height: 420px;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: .12;
+    z-index: -1;
+    animation: floatBlob 12s ease-in-out infinite alternate;
+}
+
+body::before {
+    background: #6366f1;
+    top: -150px;
+    left: -100px;
+}
+
+body::after {
+    background: #06b6d4;
+    right: -120px;
+    bottom: -150px;
+    animation-delay: 3s;
+}
+
+@keyframes floatBlob {
+    from {
+        transform: translate(0, 0) scale(1);
+    }
+
+    to {
+        transform: translate(80px, 40px) scale(1.15);
+    }
+}
+
+/* =========================================================
+   SCROLLBAR
+========================================================= */
+
+::-webkit-scrollbar {
+    width: 9px;
+}
+
+::-webkit-scrollbar-track {
+    background: #080c18;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(#6366f1, #06b6d4);
+    border-radius: 20px;
+}
+
+/* =========================================================
+   MAIN CONTAINER
+========================================================= */
 
-    <title>Code Studio - Online Compiler</title>
+.container {
+    width: min(1450px, 94%);
+    margin: auto;
+}
 
-    <style>
+/* =========================================================
+   HEADER
+========================================================= */
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: "Segoe UI", Arial, sans-serif;
-        }
+header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 
-        html {
-            scroll-behavior: smooth;
-        }
+    margin: 15px auto;
 
-        body {
-            min-height: 100vh;
+    padding: 14px 18px;
 
-            background:
-                radial-gradient(
-                    circle at 10% 10%,
-                    rgba(99, 102, 241, .30),
-                    transparent 30%
-                ),
-                radial-gradient(
-                    circle at 90% 80%,
-                    rgba(6, 182, 212, .20),
-                    transparent 30%
-                ),
-                #070b16;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 20px;
 
-            color: white;
-            padding: 20px;
-        }
+    background: rgba(10,15,30,.78);
+    backdrop-filter: blur(22px);
 
+    box-shadow:
+        0 20px 50px rgba(0,0,0,.25);
 
-        /* =====================================
-           CONTAINER
-        ===================================== */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
 
-        .container {
-            width: 100%;
-            max-width: 1450px;
-            margin: auto;
-        }
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
 
+.logo {
+    width: 46px;
+    height: 46px;
 
-        /* =====================================
-           HEADER
-        ===================================== */
+    display: grid;
+    place-items: center;
 
-        .header {
+    border-radius: 14px;
 
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+    font-size: 23px;
 
-            padding: 18px 22px;
+    background:
+        linear-gradient(135deg,#6366f1,#06b6d4);
 
-            margin-bottom: 18px;
+    box-shadow:
+        0 8px 25px rgba(99,102,241,.35);
+}
 
-            background: rgba(255,255,255,.07);
+.brand h1 {
+    font-size: 20px;
+    line-height: 1.1;
 
-            border: 1px solid rgba(255,255,255,.12);
+    background:
+        linear-gradient(90deg,#fff,#a5b4fc,#67e8f9);
 
-            border-radius: 18px;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
 
-            backdrop-filter: blur(18px);
+.brand span {
+    font-size: 11px;
+    color: #64748b;
+    letter-spacing: 1px;
+}
 
-            box-shadow:
-                0 15px 50px rgba(0,0,0,.25);
+.header-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
 
-            position: sticky;
-            top: 10px;
+.btn {
+    border: 1px solid rgba(255,255,255,.09);
 
-            z-index: 100;
-        }
+    color: #e5e7eb;
 
+    background: rgba(255,255,255,.05);
 
-        /* LOGO */
+    padding: 10px 15px;
 
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+    border-radius: 11px;
 
-        .logo-icon {
+    cursor: pointer;
 
-            width: 48px;
-            height: 48px;
+    font-weight: 600;
 
-            display: flex;
-            align-items: center;
-            justify-content: center;
+    transition: .25s;
 
-            border-radius: 14px;
+    white-space: nowrap;
+}
 
-            background:
-                linear-gradient(
-                    135deg,
-                    #6366f1,
-                    #06b6d4
-                );
+.btn:hover {
+    transform: translateY(-2px);
+    background: rgba(255,255,255,.1);
+    border-color: rgba(103,232,249,.3);
+}
 
-            font-size: 20px;
-            font-weight: bold;
+.btn-primary {
+    border: none;
 
-            box-shadow:
-                0 8px 25px rgba(99,102,241,.35);
-        }
+    background:
+        linear-gradient(135deg,#6366f1,#06b6d4);
 
-        .logo h1 {
-            font-size: 23px;
-            letter-spacing: .5px;
-        }
+    box-shadow:
+        0 8px 25px rgba(99,102,241,.25);
+}
 
-        .logo p {
-            color: #94a3b8;
-            font-size: 12px;
-            margin-top: 3px;
-        }
+.btn-primary:hover {
+    box-shadow:
+        0 12px 35px rgba(6,182,212,.3);
+}
 
+/* =========================================================
+   HERO
+========================================================= */
 
-        /* HEADER BUTTONS */
+.hero {
+    padding: 65px 10px 45px;
+    text-align: center;
+}
 
-        .buttons {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
 
-        .btn {
+    padding: 8px 14px;
 
-            border: 1px solid rgba(255,255,255,.12);
+    border-radius: 50px;
 
-            padding: 10px 15px;
+    color: #a5b4fc;
 
-            border-radius: 9px;
+    background: rgba(99,102,241,.1);
 
-            color: white;
+    border: 1px solid rgba(99,102,241,.25);
 
-            background: rgba(255,255,255,.08);
+    font-size: 13px;
+    font-weight: 700;
 
-            cursor: pointer;
+    margin-bottom: 20px;
+}
 
-            font-size: 13px;
-            font-weight: 600;
+.badge-dot {
+    width: 7px;
+    height: 7px;
 
-            transition: .25s;
-        }
+    border-radius: 50%;
 
-        .btn:hover {
-            transform: translateY(-2px);
-            background: rgba(255,255,255,.15);
-        }
+    background: #22c55e;
 
-        .run-btn {
+    box-shadow: 0 0 12px #22c55e;
+}
 
-            background:
-                linear-gradient(
-                    135deg,
-                    #6366f1,
-                    #06b6d4
-                );
+.hero h2 {
+    font-size: clamp(38px, 7vw, 76px);
+    line-height: .98;
 
-            border: none;
-        }
+    letter-spacing: -3px;
 
-        .new-btn {
-            background: rgba(239,68,68,.12);
-            border-color: rgba(239,68,68,.25);
-        }
+    max-width: 900px;
+    margin: auto;
 
-        .new-btn:hover {
-            background: #ef4444;
-        }
+    background:
+        linear-gradient(
+            100deg,
+            #ffffff 20%,
+            #a5b4fc 45%,
+            #67e8f9 70%,
+            #c084fc
+        );
 
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
 
-        /* =====================================
-           EDITOR CARD
-        ===================================== */
+.hero p {
+    max-width: 720px;
+    margin: 24px auto 0;
 
-        .editor-card {
+    color: #94a3b8;
 
-            overflow: hidden;
+    font-size: 16px;
+    line-height: 1.8;
+}
 
-            background: #101522;
+/* =========================================================
+   STATS
+========================================================= */
 
-            border: 1px solid rgba(255,255,255,.12);
+.stats {
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    gap: 14px;
 
-            border-radius: 18px;
+    margin-bottom: 25px;
+}
 
-            box-shadow:
-                0 25px 70px rgba(0,0,0,.35);
-        }
+.stat-card {
+    padding: 20px;
 
+    border-radius: 18px;
 
-        /* BROWSER BAR */
+    border: 1px solid rgba(255,255,255,.07);
 
-        .browser-bar {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.055),
+            rgba(255,255,255,.018)
+        );
 
-            height: 52px;
+    backdrop-filter: blur(16px);
 
-            display: flex;
-            align-items: center;
+    transition: .3s;
+}
 
-            padding: 0 17px;
+.stat-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(103,232,249,.22);
+}
 
-            background: #0c111d;
+.stat-icon {
+    font-size: 23px;
+    margin-bottom: 10px;
+}
 
-            border-bottom:
-                1px solid rgba(255,255,255,.08);
-        }
+.stat-number {
+    font-size: 28px;
+    font-weight: 800;
 
-        .dots {
-            display: flex;
-            gap: 7px;
-        }
+    background:
+        linear-gradient(90deg,#67e8f9,#a5b4fc);
 
-        .dot {
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
 
-            width: 11px;
-            height: 11px;
+.stat-label {
+    color: #64748b;
+    font-size: 12px;
+    margin-top: 4px;
+}
 
-            border-radius: 50%;
-        }
+/* =========================================================
+   EDITOR
+========================================================= */
 
-        .dot1 {
-            background: #ff5f57;
-        }
+.section-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
-        .dot2 {
-            background: #febc2e;
-        }
+    margin: 35px 0 15px;
+}
 
-        .dot3 {
-            background: #28c840;
-        }
+.section-title h2 {
+    font-size: 24px;
+}
 
-        .address {
+.section-title p {
+    color: #64748b;
+    font-size: 13px;
+}
 
-            flex: 1;
+.editor {
+    border-radius: 22px;
+    overflow: hidden;
 
-            margin-left: 18px;
+    border: 1px solid rgba(255,255,255,.09);
 
-            padding: 8px 14px;
+    background: #0a0f1e;
 
-            border-radius: 8px;
+    box-shadow:
+        0 30px 80px rgba(0,0,0,.35);
+}
 
-            background: rgba(255,255,255,.05);
+.editor-top {
+    height: 58px;
 
-            color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
-            font-size: 12px;
-        }
+    padding: 0 16px;
 
+    background: rgba(255,255,255,.035);
 
-        /* IFRAME */
+    border-bottom: 1px solid rgba(255,255,255,.07);
+}
 
-        .iframe-container {
+.window-controls {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
 
-            width: 100%;
+.window-dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+}
 
-            height: 72vh;
+.dot-red {
+    background: #fb7185;
+}
 
-            min-height: 600px;
+.dot-yellow {
+    background: #facc15;
+}
 
-            background: white;
-        }
+.dot-green {
+    background: #4ade80;
+}
 
-        iframe {
+.editor-title {
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 600;
+}
 
-            width: 100%;
-            height: 100%;
+.compiler-frame {
+    width: 100%;
+    height: 680px;
 
-            border: none;
+    border: none;
 
-            display: block;
-        }
+    display: block;
 
+    background: #fff;
+}
 
-        /* =====================================
-           HELP SECTION
-        ===================================== */
+/* =========================================================
+   PROGRAM SECTION
+========================================================= */
 
-        .help-section {
+.program-section {
+    margin-top: 55px;
+}
 
-            margin-top: 25px;
+.program-heading {
+    text-align: center;
+    margin-bottom: 28px;
+}
 
-            padding: 30px;
+.program-heading h2 {
+    font-size: clamp(28px,4vw,42px);
 
-            background:
-                linear-gradient(
-                    145deg,
-                    rgba(255,255,255,.07),
-                    rgba(255,255,255,.03)
-                );
+    background:
+        linear-gradient(90deg,#fff,#a5b4fc,#67e8f9);
 
-            border:
-                1px solid rgba(255,255,255,.10);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
 
-            border-radius: 18px;
-        }
+.program-heading p {
+    color: #64748b;
+    margin-top: 9px;
+}
 
+/* =========================================================
+   SEARCH
+========================================================= */
 
-        .section-header {
+.search-box {
+    position: relative;
+    margin-bottom: 15px;
+}
 
-            display: flex;
+.search-box input {
+    width: 100%;
 
-            justify-content: space-between;
+    padding: 16px 18px 16px 50px;
 
-            align-items: end;
+    border-radius: 15px;
 
-            margin-bottom: 25px;
+    border: 1px solid rgba(255,255,255,.08);
 
-            gap: 20px;
-        }
+    outline: none;
 
-        .section-header h2 {
-            font-size: 28px;
-        }
+    color: #fff;
 
-        .section-header h2 span {
-            color: #67e8f9;
-        }
+    background:
+        rgba(255,255,255,.045);
 
-        .section-header p {
+    font-size: 14px;
 
-            color: #94a3b8;
+    transition: .25s;
+}
 
-            margin-top: 7px;
+.search-box input:focus {
+    border-color: rgba(103,232,249,.45);
 
-            font-size: 13px;
-        }
+    box-shadow:
+        0 0 0 4px rgba(6,182,212,.07);
+}
 
+.search-icon {
+    position: absolute;
 
-        /* SEARCH */
+    left: 18px;
+    top: 50%;
 
-        .search {
+    transform: translateY(-50%);
 
-            width: 280px;
+    color: #64748b;
+}
 
-            padding: 12px 15px;
+/* =========================================================
+   FILTERS
+========================================================= */
 
-            border-radius: 9px;
+.program-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 12px;
 
-            border:
-                1px solid rgba(255,255,255,.12);
+    margin-bottom: 18px;
+}
 
-            background: rgba(0,0,0,.25);
+.filter-select {
+    width: 100%;
 
-            color: white;
+    padding: 13px 15px;
 
-            outline: none;
-        }
+    border-radius: 13px;
 
-        .search:focus {
-            border-color: #6366f1;
-        }
+    border: 1px solid rgba(255,255,255,.08);
 
+    background: #0d1425;
 
-        /* =====================================
-           PROGRAM GRID
-        ===================================== */
+    color: #e5e7eb;
 
-        .program-grid {
+    outline: none;
 
-            display: grid;
+    cursor: pointer;
+}
 
-            grid-template-columns:
-                repeat(auto-fit, minmax(250px, 1fr));
+.filter-select:focus {
+    border-color: rgba(103,232,249,.4);
+}
 
-            gap: 16px;
-        }
+.clear-btn {
+    padding: 0 18px;
 
+    border: 1px solid rgba(239,68,68,.18);
 
-        .program-card {
+    background: rgba(239,68,68,.07);
 
-            background: #0d1320;
+    color: #fda4af;
 
-            border:
-                1px solid rgba(255,255,255,.08);
+    border-radius: 13px;
 
-            border-radius: 14px;
+    cursor: pointer;
 
-            padding: 20px;
+    font-weight: 700;
+}
 
-            transition: .3s;
+.clear-btn:hover {
+    background: rgba(239,68,68,.13);
+}
 
-            position: relative;
+/* =========================================================
+   PROGRAM INFO
+========================================================= */
 
-            overflow: hidden;
-        }
+.program-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 
-        .program-card::before {
+    margin: 18px 0;
 
-            content: "";
+    color: #64748b;
 
-            position: absolute;
+    font-size: 13px;
+}
 
-            width: 100px;
-            height: 100px;
+.program-info strong {
+    color: #67e8f9;
+}
 
-            background: #6366f1;
+/* =========================================================
+   PROGRAM GRID
+========================================================= */
 
-            opacity: .07;
+.program-grid {
+    display: grid;
 
-            border-radius: 50%;
+    grid-template-columns:
+        repeat(auto-fill, minmax(260px, 1fr));
 
-            top: -40px;
-            right: -40px;
-        }
+    gap: 17px;
+}
 
-        .program-card:hover {
+/* =========================================================
+   PROGRAM CARD
+========================================================= */
 
-            transform: translateY(-5px);
+.program-card {
+    position: relative;
 
-            border-color:
-                rgba(99,102,241,.45);
+    padding: 21px;
 
-            box-shadow:
-                0 15px 35px rgba(0,0,0,.25);
-        }
+    min-height: 245px;
 
+    border-radius: 20px;
 
-        .program-icon {
+    border: 1px solid rgba(255,255,255,.07);
 
-            width: 42px;
-            height: 42px;
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.06),
+            rgba(255,255,255,.018)
+        );
 
-            display: flex;
+    backdrop-filter: blur(15px);
 
-            align-items: center;
-            justify-content: center;
+    overflow: hidden;
 
-            border-radius: 10px;
+    transition:
+        transform .3s,
+        border-color .3s,
+        box-shadow .3s;
+}
 
-            background:
-                rgba(99,102,241,.12);
+.program-card::before {
+    content: "";
 
-            margin-bottom: 14px;
+    position: absolute;
 
-            font-size: 20px;
-        }
+    width: 120px;
+    height: 120px;
 
-        .program-card h3 {
-            font-size: 16px;
-            margin-bottom: 7px;
-        }
+    border-radius: 50%;
 
-        .program-card p {
+    background:
+        radial-gradient(
+            circle,
+            rgba(99,102,241,.18),
+            transparent 70%
+        );
 
-            color: #64748b;
+    right: -45px;
+    top: -45px;
 
-            font-size: 12px;
+    pointer-events: none;
+}
 
-            line-height: 1.5;
+.program-card:hover {
+    transform: translateY(-7px);
 
-            min-height: 36px;
-        }
+    border-color:
+        rgba(103,232,249,.25);
 
-        .program-card button {
+    box-shadow:
+        0 20px 45px rgba(0,0,0,.28);
+}
 
-            width: 100%;
+.program-icon {
+    width: 48px;
+    height: 48px;
 
-            margin-top: 16px;
+    display: grid;
+    place-items: center;
 
-            padding: 10px;
+    font-size: 23px;
 
-            border: none;
+    border-radius: 14px;
 
-            border-radius: 7px;
+    background:
+        linear-gradient(
+            135deg,
+            rgba(99,102,241,.18),
+            rgba(6,182,212,.12)
+        );
 
-            background:
-                linear-gradient(
-                    135deg,
-                    #6366f1,
-                    #06b6d4
-                );
+    border: 1px solid rgba(255,255,255,.07);
 
-            color: white;
+    margin-bottom: 15px;
+}
 
-            cursor: pointer;
+.program-card h3 {
+    font-size: 17px;
+    margin-bottom: 9px;
 
-            font-weight: 600;
+    color: #f8fafc;
+}
 
-            transition: .25s;
-        }
+.program-card p {
+    color: #64748b;
 
-        .program-card button:hover {
-            transform: scale(1.02);
-        }
+    font-size: 13px;
 
+    line-height: 1.6;
 
-        /* =====================================
-           TIPS
-        ===================================== */
+    min-height: 42px;
+}
 
-        .tips {
+.tags {
+    display: flex;
+    flex-wrap: wrap;
 
-            display: grid;
+    gap: 6px;
 
-            grid-template-columns:
-                repeat(auto-fit, minmax(220px, 1fr));
+    margin-top: 15px;
+}
 
-            gap: 12px;
+.tag {
+    font-size: 10px;
 
-            margin-top: 25px;
-        }
+    padding: 5px 8px;
 
-        .tip {
+    border-radius: 7px;
 
-            padding: 15px;
+    background: rgba(103,232,249,.07);
 
-            border-radius: 10px;
+    border: 1px solid rgba(103,232,249,.1);
 
-            background: rgba(255,255,255,.04);
+    color: #67e8f9;
 
-            border:
-                1px solid rgba(255,255,255,.07);
+    font-weight: 700;
+}
 
-            color: #94a3b8;
+.tag.category {
+    color: #a5b4fc;
 
-            font-size: 12px;
+    background: rgba(165,180,252,.06);
 
-            line-height: 1.6;
-        }
+    border-color: rgba(165,180,252,.1);
+}
 
-        .tip strong {
-            display: block;
-            color: white;
-            margin-bottom: 5px;
-        }
+.card-actions {
+    display: grid;
 
+    grid-template-columns: 1fr 1fr;
 
-        /* =====================================
-           FOOTER
-        ===================================== */
+    gap: 8px;
 
-        .footer {
+    margin-top: 17px;
+}
 
-            text-align: center;
+.card-btn {
+    border: 1px solid rgba(255,255,255,.08);
 
-            padding: 28px 10px;
+    border-radius: 10px;
 
-            color: #64748b;
+    padding: 9px 7px;
 
-            font-size: 12px;
-        }
+    background: rgba(255,255,255,.04);
 
-        .footer strong {
-            color: #67e8f9;
-        }
+    color: #cbd5e1;
 
+    cursor: pointer;
 
-        /* =====================================
-           TOAST
-        ===================================== */
+    font-size: 12px;
 
-        .toast {
+    font-weight: 700;
 
-            position: fixed;
+    transition: .2s;
+}
 
-            bottom: 25px;
-            right: 25px;
+.card-btn:hover {
+    background: rgba(255,255,255,.09);
+}
 
-            padding: 14px 20px;
+.copy-btn {
+    background:
+        linear-gradient(
+            135deg,
+            rgba(99,102,241,.18),
+            rgba(6,182,212,.12)
+        );
 
-            background: #111827;
+    color: #67e8f9;
+}
 
-            border:
-                1px solid rgba(255,255,255,.12);
+/* =========================================================
+   EMPTY RESULT
+========================================================= */
 
-            color: white;
+.empty-state {
+    grid-column: 1 / -1;
 
-            border-radius: 10px;
+    padding: 70px 20px;
 
-            box-shadow:
-                0 15px 40px rgba(0,0,0,.4);
+    text-align: center;
 
-            transform:
-                translateY(100px);
+    border-radius: 20px;
 
-            opacity: 0;
+    border: 1px dashed rgba(255,255,255,.1);
 
-            transition: .35s;
+    background: rgba(255,255,255,.02);
+}
 
-            z-index: 9999;
+.empty-icon {
+    font-size: 50px;
+    margin-bottom: 15px;
+}
 
-            font-size: 13px;
-        }
+.empty-state h3 {
+    margin-bottom: 7px;
+}
 
-        .toast.show {
+.empty-state p {
+    color: #64748b;
+}
 
-            transform:
-                translateY(0);
+/* =========================================================
+   TIPS
+========================================================= */
 
-            opacity: 1;
-        }
+.tips {
+    margin-top: 30px;
 
+    display: grid;
 
-        /* =====================================
-           MOBILE
-        ===================================== */
+    grid-template-columns:
+        repeat(3, 1fr);
 
-        @media(max-width:700px) {
+    gap: 14px;
+}
 
-            body {
-                padding: 8px;
-            }
+.tip {
+    padding: 20px;
 
-            .header {
+    border-radius: 17px;
 
-                padding: 13px;
+    background: rgba(255,255,255,.03);
 
-                position: relative;
+    border: 1px solid rgba(255,255,255,.06);
+}
 
-            }
+.tip-icon {
+    font-size: 25px;
+    margin-bottom: 10px;
+}
 
-            .logo h1 {
-                font-size: 18px;
-            }
+.tip h3 {
+    font-size: 15px;
+    margin-bottom: 6px;
+}
 
-            .logo p {
-                display: none;
-            }
+.tip p {
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.6;
+}
 
-            .logo-icon {
-                width: 40px;
-                height: 40px;
-            }
+/* =========================================================
+   MODAL
+========================================================= */
 
-            .buttons {
-                gap: 5px;
-            }
+.modal {
+    position: fixed;
 
-            .btn {
-                padding: 8px 9px;
-                font-size: 11px;
-            }
+    inset: 0;
 
-            .iframe-container {
-                height: 75vh;
-                min-height: 500px;
-            }
+    z-index: 5000;
 
-            .help-section {
-                padding: 20px 15px;
-            }
+    display: none;
 
-            .section-header {
-                align-items: stretch;
-                flex-direction: column;
-            }
+    align-items: center;
+    justify-content: center;
 
-            .search {
-                width: 100%;
-            }
+    padding: 20px;
+}
 
-            .section-header h2 {
-                font-size: 23px;
-            }
+.modal.show {
+    display: flex;
+}
 
-            .program-grid {
-                grid-template-columns: 1fr;
-            }
+.modal-overlay {
+    position: absolute;
 
-            .browser-bar {
-                height: 45px;
-            }
+    inset: 0;
 
-            .address {
-                font-size: 10px;
-            }
-        }
+    background:
+        rgba(2,6,23,.78);
 
-    </style>
+    backdrop-filter: blur(12px);
+}
+
+.modal-box {
+    position: relative;
+
+    width: min(950px, 100%);
+
+    max-height: 90vh;
+
+    display: flex;
+    flex-direction: column;
+
+    border-radius: 20px;
+
+    border: 1px solid rgba(255,255,255,.1);
+
+    background: #0a0f1e;
+
+    box-shadow:
+        0 40px 100px rgba(0,0,0,.55);
+
+    overflow: hidden;
+
+    animation: modalIn .25s ease;
+}
+
+@keyframes modalIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px) scale(.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal-header {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 16px 18px;
+
+    border-bottom:
+        1px solid rgba(255,255,255,.07);
+}
+
+.modal-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-title-icon {
+    font-size: 23px;
+}
+
+.modal-title h3 {
+    font-size: 16px;
+}
+
+.modal-title p {
+    color: #64748b;
+    font-size: 11px;
+    margin-top: 3px;
+}
+
+.close-btn {
+    width: 36px;
+    height: 36px;
+
+    border-radius: 10px;
+
+    border: 1px solid rgba(255,255,255,.08);
+
+    background: rgba(255,255,255,.05);
+
+    color: #cbd5e1;
+
+    cursor: pointer;
+
+    font-size: 18px;
+}
+
+.code-container {
+    flex: 1;
+
+    overflow: auto;
+
+    background: #050812;
+}
+
+#codePreview {
+    margin: 0;
+
+    padding: 22px;
+
+    color: #dbeafe;
+
+    font-family:
+        "Cascadia Code",
+        "Consolas",
+        monospace;
+
+    font-size: 13px;
+
+    line-height: 1.7;
+
+    white-space: pre-wrap;
+
+    word-break: break-word;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+
+    gap: 9px;
+
+    padding: 14px 18px;
+
+    border-top:
+        1px solid rgba(255,255,255,.07);
+}
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+.toast {
+    position: fixed;
+
+    left: 50%;
+    bottom: 25px;
+
+    transform:
+        translate(-50%, 100px);
+
+    opacity: 0;
+
+    z-index: 9999;
+
+    padding: 13px 18px;
+
+    border-radius: 12px;
+
+    color: #e2e8f0;
+
+    background:
+        rgba(15,23,42,.94);
+
+    border:
+        1px solid rgba(103,232,249,.2);
+
+    box-shadow:
+        0 15px 40px rgba(0,0,0,.35);
+
+    transition: .3s;
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+.toast.show {
+    transform:
+        translate(-50%, 0);
+
+    opacity: 1;
+}
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+footer {
+    text-align: center;
+
+    padding: 55px 15px 30px;
+
+    color: #475569;
+
+    font-size: 12px;
+}
+
+footer strong {
+    color: #67e8f9;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width: 900px) {
+
+    .stats {
+        grid-template-columns:
+            repeat(2,1fr);
+    }
+
+    .program-controls {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .clear-btn {
+        min-height: 45px;
+    }
+
+    .tips {
+        grid-template-columns: 1fr;
+    }
+
+    .compiler-frame {
+        height: 600px;
+    }
+}
+
+@media(max-width: 650px) {
+
+    .container {
+        width: 94%;
+    }
+
+    header {
+        position: relative;
+
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+    .header-actions {
+        width: 100%;
+    }
+
+    .header-actions .btn {
+        flex: 1;
+    }
+
+    .hero {
+        padding-top: 40px;
+    }
+
+    .hero h2 {
+        letter-spacing: -1.5px;
+    }
+
+    .stats {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .program-controls {
+        grid-template-columns: 1fr;
+    }
+
+    .program-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .compiler-frame {
+        height: 520px;
+    }
+
+    .program-info {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 5px;
+    }
+}
+
+@media(max-width: 420px) {
+
+    .stats {
+        grid-template-columns: 1fr;
+    }
+
+    .card-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .hero h2 {
+        font-size: 40px;
+    }
+}
+
+</style>
 </head>
-
 
 <body>
 
-
 <div class="container">
 
+<!-- ========================================================
+     HEADER
+========================================================= -->
 
-    <!-- =====================================
-         HEADER
-    ====================================== -->
+<header>
 
-    <header class="header">
+    <div class="logo-area">
 
         <div class="logo">
+            &lt;/&gt;
+        </div>
 
-            <div class="logo-icon">
-                &lt;/&gt;
+        <div class="brand">
+            <h1>CodeForge Studio</h1>
+            <span>ONLINE COMPILER & PRACTICAL LAB</span>
+        </div>
+
+    </div>
+
+    <div class="header-actions">
+
+        <button class="btn" onclick="newFile()">
+            📄 New
+        </button>
+
+        <button class="btn" onclick="reloadEditor()">
+            🔄 Refresh
+        </button>
+
+        <button class="btn" onclick="goFullScreen()">
+            ⛶ Fullscreen
+        </button>
+
+        <button class="btn btn-primary"
+                onclick="scrollToPrograms()">
+            📚 Programs
+        </button>
+
+    </div>
+
+</header>
+
+
+<!-- ========================================================
+     HERO
+========================================================= -->
+
+<section class="hero">
+
+    <div class="badge">
+        <span class="badge-dot"></span>
+        100% Browser Based Coding Lab
+    </div>
+
+    <h2>
+        Code. Run. Learn.
+        <br>
+        Build Your Skills.
+    </h2>
+
+    <p>
+        A beautiful online coding workspace with practical programs
+        for Python, C, C++, Java, JavaScript, HTML, SQL, R and Bash.
+    </p>
+
+</section>
+
+
+<!-- ========================================================
+     STATS
+========================================================= -->
+
+<section class="stats">
+
+    <div class="stat-card">
+
+        <div class="stat-icon">💻</div>
+
+        <div class="stat-number" id="totalPrograms">
+            76
+        </div>
+
+        <div class="stat-label">
+            Practical Programs
+        </div>
+
+    </div>
+
+    <div class="stat-card">
+
+        <div class="stat-icon">🌐</div>
+
+        <div class="stat-number" id="totalLanguages">
+            9
+        </div>
+
+        <div class="stat-label">
+            Languages
+        </div>
+
+    </div>
+
+    <div class="stat-card">
+
+        <div class="stat-icon">📚</div>
+
+        <div class="stat-number" id="totalCategories">
+            0
+        </div>
+
+        <div class="stat-label">
+            Categories
+        </div>
+
+    </div>
+
+    <div class="stat-card">
+
+        <div class="stat-icon">⚡</div>
+
+        <div class="stat-number">
+            24/7
+        </div>
+
+        <div class="stat-label">
+            Available Online
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ========================================================
+     COMPILER
+========================================================= -->
+
+<section id="editor">
+
+    <div class="section-title">
+
+        <div>
+            <h2>⚡ Online Compiler</h2>
+
+            <p>
+                Select your language inside the compiler and run your program.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="editor">
+
+        <div class="editor-top">
+
+            <div class="window-controls">
+
+                <span class="window-dot dot-red"></span>
+                <span class="window-dot dot-yellow"></span>
+                <span class="window-dot dot-green"></span>
+
             </div>
 
-            <div>
-
-                <h1>Code Studio</h1>
-
-                <p>
-                    Write • Run • Learn • Experiment
-                </p>
-
+            <div class="editor-title">
+                CodeForge Compiler • OneCompiler
             </div>
+
+            <div style="width:55px;"></div>
 
         </div>
 
 
-        <div class="buttons">
+        <iframe
+            id="compiler"
+            class="compiler-frame"
+            src="https://onecompiler.com/embed/?listenToEvents=true"
+            allowfullscreen>
+        </iframe>
 
-            <button
-                class="btn new-btn"
-                onclick="newFile()">
+    </div>
 
-                📄 New File
-
-            </button>
-
-
-            <button
-                class="btn"
-                onclick="goFullScreen()">
-
-                ⛶ Fullscreen
-
-            </button>
+</section>
 
 
-            <button
-                class="btn run-btn"
-                onclick="reloadEditor()">
+<!-- ========================================================
+     PROGRAMS
+========================================================= -->
 
-                ▶ Run
+<section
+    id="programSection"
+    class="program-section">
 
-            </button>
+    <div class="program-heading">
 
+        <div class="badge">
+            🧠 PRACTICAL PROGRAM LIBRARY
         </div>
 
-    </header>
-
-
-
-    <!-- =====================================
-         EDITOR
-    ====================================== -->
-
-    <section class="editor-card">
-
-
-        <div class="browser-bar">
-
-            <div class="dots">
-
-                <span class="dot dot1"></span>
-
-                <span class="dot dot2"></span>
-
-                <span class="dot dot3"></span>
-
-            </div>
-
-
-            <div class="address">
-
-                🔒 onecompiler.com / online-editor
-
-            </div>
-
-        </div>
-
-
-        <div
-            class="iframe-container"
-            id="editor">
-
-            <iframe
-                id="compiler"
-                src="https://onecompiler.com/embed/?listenToEvents=true"
-                allowfullscreen>
-            </iframe>
-
-        </div>
-
-    </section>
-
-
-
-    <!-- =====================================
-         BASIC PROGRAMS
-    ====================================== -->
-
-    <section class="help-section">
-
-
-        <div class="section-header">
-
-            <div>
-
-                <h2>
-                    📚 Basic <span>Programs</span>
-                </h2>
-
-                <p>
-                    Beginner-friendly programs to help you learn programming.
-                </p>
-
-            </div>
-
-
-            <input
-                class="search"
-                id="programSearch"
-                type="text"
-                placeholder="🔎 Search programs..."
-                oninput="searchPrograms()">
-
-        </div>
-
-
-
-        <div
-            class="program-grid"
-            id="programGrid">
-        </div>
-
-
-
-        <!-- TIPS -->
-
-        <div class="tips">
-
-            <div class="tip">
-
-                <strong>💡 Tip 1</strong>
-
-                Select a program and click
-                "Copy Code". Then paste it
-                into a new OneCompiler file.
-
-            </div>
-
-
-            <div class="tip">
-
-                <strong>🚀 Tip 2</strong>
-
-                Change the values in the
-                program and run it to
-                understand how it works.
-
-            </div>
-
-
-            <div class="tip">
-
-                <strong>🐍 Tip 3</strong>
-
-                Try Python programs first
-                if you are a beginner.
-
-            </div>
-
-
-            <div class="tip">
-
-                <strong>⚡ Tip 4</strong>
-
-                You can use the OneCompiler
-                language selector to switch
-                between programming languages.
-
-            </div>
-
-        </div>
-
-
-    </section>
-
-
-
-    <!-- =====================================
-         FOOTER
-    ====================================== -->
-
-    <footer class="footer">
+        <h2>
+            Learn With Ready-to-Run Programs
+        </h2>
 
         <p>
-            Code with fun 
+            Search, filter, view and copy programs instantly.
         </p>
 
-        <p>
-            Made by
-            <strong>Madanu Anoop</strong>
-        </p>
+    </div>
 
-    </footer>
 
+    <!-- SEARCH -->
+
+    <div class="search-box">
+
+        <span class="search-icon">
+            🔎
+        </span>
+
+        <input
+            id="programSearch"
+            type="search"
+            placeholder="Search programs, languages, categories..."
+            oninput="filterPrograms()">
+
+    </div>
+
+
+    <!-- FILTERS -->
+
+    <div class="program-controls">
+
+        <select
+            id="languageFilter"
+            class="filter-select"
+            onchange="filterPrograms()">
+
+            <option value="all">
+                🌐 All Languages
+            </option>
+
+        </select>
+
+
+        <select
+            id="categoryFilter"
+            class="filter-select"
+            onchange="filterPrograms()">
+
+            <option value="all">
+                📚 All Categories
+            </option>
+
+        </select>
+
+
+        <button
+            class="clear-btn"
+            onclick="clearFilters()">
+
+            ✕ Clear Filters
+
+        </button>
+
+    </div>
+
+
+    <!-- INFO -->
+
+    <div class="program-info">
+
+        <span>
+            Showing
+            <strong id="visibleCount">76</strong>
+            programs
+        </span>
+
+        <span>
+            Total:
+            <strong id="libraryCount">76</strong>
+        </span>
+
+    </div>
+
+
+    <!-- PROGRAM GRID -->
+
+    <div
+        id="programGrid"
+        class="program-grid">
+    </div>
+
+
+    <!-- TIPS -->
+
+    <div class="tips">
+
+        <div class="tip">
+
+            <div class="tip-icon">
+                🔎
+            </div>
+
+            <h3>
+                Find Programs
+            </h3>
+
+            <p>
+                Search by program name, language,
+                category or description.
+            </p>
+
+        </div>
+
+
+        <div class="tip">
+
+            <div class="tip-icon">
+                👁️
+            </div>
+
+            <h3>
+                View Code
+            </h3>
+
+            <p>
+                Open any program to inspect the complete
+                standalone source code.
+            </p>
+
+        </div>
+
+
+        <div class="tip">
+
+            <div class="tip-icon">
+                📋
+            </div>
+
+            <h3>
+                Copy & Run
+            </h3>
+
+            <p>
+                Copy the code and paste it into the
+                OneCompiler editor to execute it.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ========================================================
+     FOOTER
+========================================================= -->
+
+<footer>
+    <p>code with fun and joy</p>
+
+    <p>
+        Made by
+        <strong>Madanu Anoop</strong>
+    </p>
+
+    <p style="margin-top:7px;">
+        CodeForge Studio • Practical Coding Laboratory
+    </p>
+
+</footer>
 
 </div>
 
 
+<!-- ========================================================
+     CODE MODAL
+========================================================= -->
 
-<!-- TOAST -->
+<div
+    id="codeModal"
+    class="modal"
+    aria-hidden="true">
+
+    <div
+        class="modal-overlay"
+        onclick="closeCode()">
+    </div>
+
+
+    <div class="modal-box">
+
+        <div class="modal-header">
+
+            <div class="modal-title">
+
+                <div
+                    id="modalIcon"
+                    class="modal-title-icon">
+                    💻
+                </div>
+
+                <div>
+
+                    <h3 id="modalTitle">
+                        Program
+                    </h3>
+
+                    <p id="modalMeta">
+                        Source code
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <button
+                class="close-btn"
+                onclick="closeCode()">
+
+                ✕
+
+            </button>
+
+        </div>
+
+
+        <div class="code-container">
+
+            <pre><code id="codePreview"></code></pre>
+
+        </div>
+
+
+        <div class="modal-footer">
+
+            <button
+                class="btn"
+                onclick="closeCode()">
+
+                Close
+
+            </button>
+
+            <button
+                id="modalCopyBtn"
+                class="btn btn-primary"
+                onclick="copyModalCode()">
+
+                📋 Copy Code
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================
+     TOAST
+========================================================= -->
 
 <div
     id="toast"
     class="toast">
-
-    Code copied successfully! ✅
-
 </div>
-
 
 
 <script>
 
-
-/* =====================================
-   BASIC PROGRAM DATABASE
-===================================== */
+/* =========================================================
+   PRACTICAL PROGRAM DATABASE
+   76 COMPLETE STANDALONE PROGRAMS
+========================================================= */
 
 const programs = [
 
-    {
-        icon: "🐍",
-        language: "Python",
-        title: "Hello World",
-        description: "Your first Python program.",
-        code:
-`print("Hello, World!")`
-    },
+/* =========================================================
+   PYTHON - 24
+========================================================= */
 
+{
+    id:"py001",
+    icon:"🐍",
+    language:"Python",
+    title:"Hello World",
+    category:"Basics",
+    description:"Display Hello World.",
+    code:`print("Hello, World!")`
+},
 
-    {
-        icon: "➕",
-        language: "Python",
-        title: "Addition",
-        description: "Add two numbers.",
-        code:
-`a = 10
-b = 20
-
-sum = a + b
-
-print("Sum =", sum)`
-    },
-
-
-    {
-        icon: "🧮",
-        language: "Python",
-        title: "Arithmetic Operations",
-        description: "Addition, subtraction, multiplication and division.",
-        code:
-`a = 20
+{
+    id:"py002",
+    icon:"➕",
+    language:"Python",
+    title:"Arithmetic Operations",
+    category:"Basics",
+    description:"Perform basic arithmetic operations.",
+    code:`a = 20
 b = 5
 
-print("Addition:", a + b)
-print("Subtraction:", a - b)
-print("Multiplication:", a * b)
-print("Division:", a / b)`
-    },
+print("Addition =", a + b)
+print("Subtraction =", a - b)
+print("Multiplication =", a * b)
+print("Division =", a / b)
+print("Modulus =", a % b)`
+},
 
-
-    {
-        icon: "🔢",
-        language: "Python",
-        title: "Even or Odd",
-        description: "Check whether a number is even or odd.",
-        code:
-`num = int(input("Enter a number: "))
+{
+    id:"py003",
+    icon:"🔢",
+    language:"Python",
+    title:"Even or Odd",
+    category:"Conditional",
+    description:"Check whether a number is even or odd.",
+    code:`num = int(input("Enter a number: "))
 
 if num % 2 == 0:
-    print("Even number")
+    print("Even Number")
 else:
-    print("Odd number")`
-    },
+    print("Odd Number")`
+},
 
-
-    {
-        icon: "⭐",
-        language: "Python",
-        title: "Largest Number",
-        description: "Find the largest of three numbers.",
-        code:
-`a = 10
-b = 25
-c = 15
+{
+    id:"py004",
+    icon:"⭐",
+    language:"Python",
+    title:"Largest of Three Numbers",
+    category:"Conditional",
+    description:"Find the largest among three numbers.",
+    code:`a = int(input("Enter first number: "))
+b = int(input("Enter second number: "))
+c = int(input("Enter third number: "))
 
 if a >= b and a >= c:
     largest = a
@@ -1005,54 +1737,71 @@ else:
     largest = c
 
 print("Largest =", largest)`
-    },
+},
 
+{
+    id:"py005",
+    icon:"🔢",
+    language:"Python",
+    title:"Positive Negative Zero",
+    category:"Conditional",
+    description:"Check whether a number is positive, negative or zero.",
+    code:`num = float(input("Enter a number: "))
 
-    {
-        icon: "🔁",
-        language: "Python",
-        title: "For Loop",
-        description: "Print numbers from 1 to 10.",
-        code:
-`for i in range(1, 11):
+if num > 0:
+    print("Positive")
+elif num < 0:
+    print("Negative")
+else:
+    print("Zero")`
+},
+
+{
+    id:"py006",
+    icon:"🔁",
+    language:"Python",
+    title:"For Loop",
+    category:"Loops",
+    description:"Print numbers from 1 to 10.",
+    code:`for i in range(1, 11):
     print(i)`
-    },
+},
 
-
-    {
-        icon: "🔄",
-        language: "Python",
-        title: "While Loop",
-        description: "Learn how a while loop works.",
-        code:
-`i = 1
+{
+    id:"py007",
+    icon:"🔄",
+    language:"Python",
+    title:"While Loop",
+    category:"Loops",
+    description:"Print numbers using a while loop.",
+    code:`i = 1
 
 while i <= 10:
     print(i)
     i += 1`
-    },
+},
 
-
-    {
-        icon: "✖️",
-        language: "Python",
-        title: "Multiplication Table",
-        description: "Print a multiplication table.",
-        code:
-`num = int(input("Enter number: "))
+{
+    id:"py008",
+    icon:"✖️",
+    language:"Python",
+    title:"Multiplication Table",
+    category:"Loops",
+    description:"Generate a multiplication table.",
+    code:`num = int(input("Enter number: "))
 
 for i in range(1, 11):
     print(num, "x", i, "=", num * i)`
-    },
+},
 
-
-    {
-        icon: "🔢",
-        language: "Python",
-        title: "Sum 1 to N",
-        description: "Find the sum from 1 to n.",
-        code:
-`n = int(input("Enter n: "))
+{
+    id:"py009",
+    icon:"➕",
+    language:"Python",
+    title:"Sum of N Numbers",
+    category:"Loops",
+    description:"Find the sum from 1 to N.",
+    code:`n = int(input("Enter N: "))
 
 total = 0
 
@@ -1060,25 +1809,41 @@ for i in range(1, n + 1):
     total += i
 
 print("Sum =", total)`
-    },
+},
 
+{
+    id:"py010",
+    icon:"🎯",
+    language:"Python",
+    title:"Factorial",
+    category:"Functions",
+    description:"Find factorial of a number.",
+    code:`n = int(input("Enter a number: "))
 
-    {
-        icon: "🔍",
-        language: "Python",
-        title: "Prime Number",
-        description: "Check whether a number is prime.",
-        code:
-`num = int(input("Enter a number: "))
+factorial = 1
 
-if num < 2:
+for i in range(1, n + 1):
+    factorial *= i
+
+print("Factorial =", factorial)`
+},
+
+{
+    id:"py011",
+    icon:"🔍",
+    language:"Python",
+    title:"Prime Number",
+    category:"Numbers",
+    description:"Check whether a number is prime.",
+    code:`n = int(input("Enter a number: "))
+
+if n < 2:
     print("Not Prime")
 else:
-
     prime = True
 
-    for i in range(2, num):
-        if num % i == 0:
+    for i in range(2, int(n ** 0.5) + 1):
+        if n % i == 0:
             prime = False
             break
 
@@ -1086,252 +1851,1693 @@ else:
         print("Prime Number")
     else:
         print("Not Prime")`
-    },
+},
 
-
-    {
-        icon: "🌀",
-        language: "Python",
-        title: "Fibonacci Series",
-        description: "Generate Fibonacci numbers.",
-        code:
-`n = int(input("Enter number of terms: "))
+{
+    id:"py012",
+    icon:"🌀",
+    language:"Python",
+    title:"Fibonacci Series",
+    category:"Numbers",
+    description:"Generate Fibonacci series.",
+    code:`n = int(input("Enter number of terms: "))
 
 a = 0
 b = 1
 
 for i in range(n):
-
     print(a, end=" ")
-
     a, b = b, a + b`
-    },
+},
 
+{
+    id:"py013",
+    icon:"🔄",
+    language:"Python",
+    title:"Reverse Number",
+    category:"Numbers",
+    description:"Reverse a number.",
+    code:`n = int(input("Enter number: "))
 
-    {
-        icon: "📋",
-        language: "Python",
-        title: "List Example",
-        description: "Create and display a Python list.",
-        code:
-`numbers = [10, 20, 30, 40, 50]
+reverse = 0
 
-print("List:", numbers)
+while n != 0:
+    digit = n % 10
+    reverse = reverse * 10 + digit
+    n //= 10
 
-for number in numbers:
-    print(number)`
-    },
+print("Reverse =", reverse)`
+},
 
+{
+    id:"py014",
+    icon:"🔢",
+    language:"Python",
+    title:"Palindrome Number",
+    category:"Numbers",
+    description:"Check whether a number is palindrome.",
+    code:`n = int(input("Enter number: "))
 
-    {
-        icon: "📝",
-        language: "Python",
-        title: "String Reverse",
-        description: "Reverse a string using Python.",
-        code:
-`text = input("Enter text: ")
+original = n
+reverse = 0
 
-reverse = text[::-1]
+while n != 0:
+    digit = n % 10
+    reverse = reverse * 10 + digit
+    n //= 10
 
-print("Reverse:", reverse)`
-    },
+if original == reverse:
+    print("Palindrome")
+else:
+    print("Not Palindrome")`
+},
 
+{
+    id:"py015",
+    icon:"💪",
+    language:"Python",
+    title:"Armstrong Number",
+    category:"Numbers",
+    description:"Check whether a number is Armstrong.",
+    code:`n = int(input("Enter number: "))
 
-    {
-        icon: "🎯",
-        language: "Python",
-        title: "Factorial",
-        description: "Find the factorial of a number.",
-        code:
-`num = int(input("Enter a number: "))
+digits = str(n)
+power = len(digits)
 
-factorial = 1
+total = sum(int(digit) ** power for digit in digits)
 
-for i in range(1, num + 1):
-    factorial *= i
+if total == n:
+    print("Armstrong Number")
+else:
+    print("Not Armstrong")`
+},
 
-print("Factorial =", factorial)`
-    },
+{
+    id:"py016",
+    icon:"📋",
+    language:"Python",
+    title:"List Operations",
+    category:"Lists",
+    description:"Perform common list operations.",
+    code:`numbers = [10, 20, 30, 40, 50]
 
+print("Original List:", numbers)
 
-    {
-        icon: "🔤",
-        language: "Python",
-        title: "Count Vowels",
-        description: "Count vowels in a string.",
-        code:
-`text = input("Enter text: ")
+numbers.append(60)
+print("After append:", numbers)
+
+numbers.remove(20)
+print("After remove:", numbers)
+
+print("Length:", len(numbers))
+print("Maximum:", max(numbers))
+print("Minimum:", min(numbers))`
+},
+
+{
+    id:"py017",
+    icon:"🔎",
+    language:"Python",
+    title:"Linear Search",
+    category:"Searching",
+    description:"Search an element in a list.",
+    code:`numbers = [10, 20, 30, 40, 50]
+
+key = int(input("Enter element to search: "))
+
+found = False
+
+for i in range(len(numbers)):
+    if numbers[i] == key:
+        print("Element found at index", i)
+        found = True
+        break
+
+if not found:
+    print("Element not found")`
+},
+
+{
+    id:"py018",
+    icon:"↕️",
+    language:"Python",
+    title:"Bubble Sort",
+    category:"Sorting",
+    description:"Sort a list using bubble sort.",
+    code:`numbers = [64, 34, 25, 12, 22, 11, 90]
+
+n = len(numbers)
+
+for i in range(n):
+    for j in range(0, n - i - 1):
+
+        if numbers[j] > numbers[j + 1]:
+            numbers[j], numbers[j + 1] = numbers[j + 1], numbers[j]
+
+print("Sorted List:", numbers)`
+},
+
+{
+    id:"py019",
+    icon:"🔤",
+    language:"Python",
+    title:"Reverse String",
+    category:"Strings",
+    description:"Reverse a string.",
+    code:`text = input("Enter string: ")
+
+print("Reverse:", text[::-1])`
+},
+
+{
+    id:"py020",
+    icon:"🔤",
+    language:"Python",
+    title:"Count Vowels",
+    category:"Strings",
+    description:"Count vowels in a string.",
+    code:`text = input("Enter text: ")
 
 count = 0
 
-for char in text.lower():
-
-    if char in "aeiou":
+for ch in text.lower():
+    if ch in "aeiou":
         count += 1
 
-print("Vowels =", count)`
-    },
+print("Number of vowels:", count)`
+},
 
+{
+    id:"py021",
+    icon:"📝",
+    language:"Python",
+    title:"Word Count",
+    category:"Strings",
+    description:"Count words in a sentence.",
+    code:`text = input("Enter sentence: ")
 
-    {
-        icon: "🌐",
-        language: "HTML",
-        title: "Basic HTML",
-        description: "Create a simple HTML webpage.",
-        code:
-`<!DOCTYPE html>
+words = text.split()
 
+print("Number of words:", len(words))`
+},
+
+{
+    id:"py022",
+    icon:"📊",
+    language:"Python",
+    title:"Student Marks",
+    category:"Practical",
+    description:"Calculate total, average and grade.",
+    code:`name = input("Enter student name: ")
+
+m1 = float(input("Enter subject 1 marks: "))
+m2 = float(input("Enter subject 2 marks: "))
+m3 = float(input("Enter subject 3 marks: "))
+
+total = m1 + m2 + m3
+average = total / 3
+
+print("Student:", name)
+print("Total:", total)
+print("Average:", average)
+
+if average >= 90:
+    grade = "A"
+elif average >= 75:
+    grade = "B"
+elif average >= 60:
+    grade = "C"
+elif average >= 40:
+    grade = "D"
+else:
+    grade = "F"
+
+print("Grade:", grade)`
+},
+
+{
+    id:"py023",
+    icon:"🏦",
+    language:"Python",
+    title:"Simple Interest",
+    category:"Practical",
+    description:"Calculate simple interest.",
+    code:`p = float(input("Enter principal: "))
+r = float(input("Enter rate: "))
+t = float(input("Enter time: "))
+
+si = (p * r * t) / 100
+
+print("Simple Interest =", si)
+print("Amount =", p + si)`
+},
+
+{
+    id:"py024",
+    icon:"🔢",
+    language:"Python",
+    title:"GCD and LCM",
+    category:"Numbers",
+    description:"Find GCD and LCM of two numbers.",
+    code:`import math
+
+a = int(input("Enter first number: "))
+b = int(input("Enter second number: "))
+
+gcd = math.gcd(a, b)
+
+if gcd != 0:
+    lcm = abs(a * b) // gcd
+else:
+    lcm = 0
+
+print("GCD =", gcd)
+print("LCM =", lcm)`
+},
+
+/* =========================================================
+   C - 10
+========================================================= */
+
+{
+    id:"c001",
+    icon:"💻",
+    language:"C",
+    title:"Hello World",
+    category:"Basics",
+    description:"Basic C program.",
+    code:`#include <stdio.h>
+
+int main() {
+    printf("Hello, World!");
+    return 0;
+}`
+},
+
+{
+    id:"c002",
+    icon:"➕",
+    language:"C",
+    title:"Arithmetic Operations",
+    category:"Basics",
+    description:"Perform arithmetic operations.",
+    code:`#include <stdio.h>
+
+int main() {
+    int a = 20;
+    int b = 5;
+
+    printf("Addition = %d\\n", a + b);
+    printf("Subtraction = %d\\n", a - b);
+    printf("Multiplication = %d\\n", a * b);
+    printf("Division = %d\\n", a / b);
+
+    return 0;
+}`
+},
+
+{
+    id:"c003",
+    icon:"🔢",
+    language:"C",
+    title:"Even or Odd",
+    category:"Conditional",
+    description:"Check even or odd.",
+    code:`#include <stdio.h>
+
+int main() {
+    int n;
+
+    printf("Enter number: ");
+    scanf("%d", &n);
+
+    if (n % 2 == 0)
+        printf("Even Number");
+    else
+        printf("Odd Number");
+
+    return 0;
+}`
+},
+
+{
+    id:"c004",
+    icon:"🔍",
+    language:"C",
+    title:"Prime Number",
+    category:"Numbers",
+    description:"Check prime number.",
+    code:`#include <stdio.h>
+
+int main() {
+    int n, i, prime = 1;
+
+    printf("Enter number: ");
+    scanf("%d", &n);
+
+    if (n < 2)
+        prime = 0;
+
+    for (i = 2; i * i <= n; i++) {
+        if (n % i == 0) {
+            prime = 0;
+            break;
+        }
+    }
+
+    if (prime)
+        printf("Prime Number");
+    else
+        printf("Not Prime");
+
+    return 0;
+}`
+},
+
+{
+    id:"c005",
+    icon:"🌀",
+    language:"C",
+    title:"Fibonacci Series",
+    category:"Numbers",
+    description:"Generate Fibonacci series.",
+    code:`#include <stdio.h>
+
+int main() {
+    int n, i;
+    int a = 0, b = 1, c;
+
+    printf("Enter number of terms: ");
+    scanf("%d", &n);
+
+    for (i = 0; i < n; i++) {
+        printf("%d ", a);
+
+        c = a + b;
+        a = b;
+        b = c;
+    }
+
+    return 0;
+}`
+},
+
+{
+    id:"c006",
+    icon:"🎯",
+    language:"C",
+    title:"Factorial",
+    category:"Numbers",
+    description:"Calculate factorial.",
+    code:`#include <stdio.h>
+
+int main() {
+    int n, i;
+    long long factorial = 1;
+
+    printf("Enter number: ");
+    scanf("%d", &n);
+
+    for (i = 1; i <= n; i++)
+        factorial *= i;
+
+    printf("Factorial = %lld", factorial);
+
+    return 0;
+}`
+},
+
+{
+    id:"c007",
+    icon:"📋",
+    language:"C",
+    title:"Array Sum",
+    category:"Arrays",
+    description:"Find sum of array elements.",
+    code:`#include <stdio.h>
+
+int main() {
+    int a[5] = {10, 20, 30, 40, 50};
+    int i, sum = 0;
+
+    for (i = 0; i < 5; i++)
+        sum += a[i];
+
+    printf("Sum = %d", sum);
+
+    return 0;
+}`
+},
+
+{
+    id:"c008",
+    icon:"🔎",
+    language:"C",
+    title:"Linear Search",
+    category:"Searching",
+    description:"Search an element in an array.",
+    code:`#include <stdio.h>
+
+int main() {
+    int a[5] = {10, 20, 30, 40, 50};
+    int key, i, found = 0;
+
+    printf("Enter element: ");
+    scanf("%d", &key);
+
+    for (i = 0; i < 5; i++) {
+        if (a[i] == key) {
+            printf("Element found at index %d", i);
+            found = 1;
+            break;
+        }
+    }
+
+    if (!found)
+        printf("Element not found");
+
+    return 0;
+}`
+},
+
+{
+    id:"c009",
+    icon:"↕️",
+    language:"C",
+    title:"Bubble Sort",
+    category:"Sorting",
+    description:"Sort array using bubble sort.",
+    code:`#include <stdio.h>
+
+int main() {
+    int a[5] = {50, 20, 40, 10, 30};
+    int i, j, temp;
+
+    for (i = 0; i < 5; i++) {
+        for (j = 0; j < 4 - i; j++) {
+            if (a[j] > a[j + 1]) {
+                temp = a[j];
+                a[j] = a[j + 1];
+                a[j + 1] = temp;
+            }
+        }
+    }
+
+    printf("Sorted array: ");
+
+    for (i = 0; i < 5; i++)
+        printf("%d ", a[i]);
+
+    return 0;
+}`
+},
+
+{
+    id:"c010",
+    icon:"🧮",
+    language:"C",
+    title:"Matrix Addition",
+    category:"Matrices",
+    description:"Add two 2x2 matrices.",
+    code:`#include <stdio.h>
+
+int main() {
+    int a[2][2] = {{1, 2}, {3, 4}};
+    int b[2][2] = {{5, 6}, {7, 8}};
+    int c[2][2];
+    int i, j;
+
+    for (i = 0; i < 2; i++) {
+        for (j = 0; j < 2; j++) {
+            c[i][j] = a[i][j] + b[i][j];
+        }
+    }
+
+    printf("Result:\\n");
+
+    for (i = 0; i < 2; i++) {
+        for (j = 0; j < 2; j++)
+            printf("%d ", c[i][j]);
+
+        printf("\\n");
+    }
+
+    return 0;
+}`
+},
+
+/* =========================================================
+   C++ - 6
+========================================================= */
+
+{
+    id:"cpp001",
+    icon:"⚙️",
+    language:"C++",
+    title:"Hello World",
+    category:"Basics",
+    description:"Basic C++ program.",
+    code:`#include <iostream>
+using namespace std;
+
+int main() {
+    cout << "Hello, World!";
+    return 0;
+}`
+},
+
+{
+    id:"cpp002",
+    icon:"➕",
+    language:"C++",
+    title:"Arithmetic Operations",
+    category:"Basics",
+    description:"Perform arithmetic operations.",
+    code:`#include <iostream>
+using namespace std;
+
+int main() {
+    int a = 20;
+    int b = 5;
+
+    cout << "Addition = " << a + b << endl;
+    cout << "Subtraction = " << a - b << endl;
+    cout << "Multiplication = " << a * b << endl;
+    cout << "Division = " << a / b << endl;
+
+    return 0;
+}`
+},
+
+{
+    id:"cpp003",
+    icon:"🔢",
+    language:"C++",
+    title:"Even or Odd",
+    category:"Conditional",
+    description:"Check whether a number is even or odd.",
+    code:`#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+
+    cout << "Enter number: ";
+    cin >> n;
+
+    if (n % 2 == 0)
+        cout << "Even Number";
+    else
+        cout << "Odd Number";
+
+    return 0;
+}`
+},
+
+{
+    id:"cpp004",
+    icon:"🔍",
+    language:"C++",
+    title:"Prime Number",
+    category:"Numbers",
+    description:"Check prime number.",
+    code:`#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    bool prime = true;
+
+    cout << "Enter number: ";
+    cin >> n;
+
+    if (n < 2)
+        prime = false;
+
+    for (int i = 2; i * i <= n; i++) {
+        if (n % i == 0) {
+            prime = false;
+            break;
+        }
+    }
+
+    if (prime)
+        cout << "Prime Number";
+    else
+        cout << "Not Prime";
+
+    return 0;
+}`
+},
+
+{
+    id:"cpp005",
+    icon:"🌀",
+    language:"C++",
+    title:"Fibonacci Series",
+    category:"Numbers",
+    description:"Generate Fibonacci series.",
+    code:`#include <iostream>
+using namespace std;
+
+int main() {
+    int n;
+    int a = 0, b = 1;
+
+    cout << "Enter terms: ";
+    cin >> n;
+
+    for (int i = 0; i < n; i++) {
+        cout << a << " ";
+
+        int c = a + b;
+        a = b;
+        b = c;
+    }
+
+    return 0;
+}`
+},
+
+{
+    id:"cpp006",
+    icon:"📋",
+    language:"C++",
+    title:"Vector Example",
+    category:"STL",
+    description:"Basic vector operations.",
+    code:`#include <iostream>
+#include <vector>
+using namespace std;
+
+int main() {
+    vector<int> numbers = {10, 20, 30, 40};
+
+    numbers.push_back(50);
+
+    cout << "Vector elements: ";
+
+    for (int x : numbers)
+        cout << x << " ";
+
+    return 0;
+}`
+},
+
+/* =========================================================
+   JAVA - 8
+========================================================= */
+
+{
+    id:"java001",
+    icon:"☕",
+    language:"Java",
+    title:"Hello World",
+    category:"Basics",
+    description:"Basic Java program.",
+    code:`public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+    }
+}`
+},
+
+{
+    id:"java002",
+    icon:"➕",
+    language:"Java",
+    title:"Arithmetic Operations",
+    category:"Basics",
+    description:"Perform arithmetic operations.",
+    code:`public class Main {
+    public static void main(String[] args) {
+        int a = 20;
+        int b = 5;
+
+        System.out.println("Addition = " + (a + b));
+        System.out.println("Subtraction = " + (a - b));
+        System.out.println("Multiplication = " + (a * b));
+        System.out.println("Division = " + (a / b));
+    }
+}`
+},
+
+{
+    id:"java003",
+    icon:"🔢",
+    language:"Java",
+    title:"Even or Odd",
+    category:"Conditional",
+    description:"Check even or odd.",
+    code:`import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter number: ");
+        int n = sc.nextInt();
+
+        if (n % 2 == 0)
+            System.out.println("Even Number");
+        else
+            System.out.println("Odd Number");
+    }
+}`
+},
+
+{
+    id:"java004",
+    icon:"🎯",
+    language:"Java",
+    title:"Factorial",
+    category:"Numbers",
+    description:"Calculate factorial.",
+    code:`import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter number: ");
+        int n = sc.nextInt();
+
+        long factorial = 1;
+
+        for (int i = 1; i <= n; i++)
+            factorial *= i;
+
+        System.out.println("Factorial = " + factorial);
+    }
+}`
+},
+
+{
+    id:"java005",
+    icon:"🌀",
+    language:"Java",
+    title:"Fibonacci Series",
+    category:"Numbers",
+    description:"Generate Fibonacci series.",
+    code:`import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter terms: ");
+        int n = sc.nextInt();
+
+        int a = 0;
+        int b = 1;
+
+        for (int i = 0; i < n; i++) {
+            System.out.print(a + " ");
+
+            int c = a + b;
+            a = b;
+            b = c;
+        }
+    }
+}`
+},
+
+{
+    id:"java006",
+    icon:"📋",
+    language:"Java",
+    title:"Array Average",
+    category:"Arrays",
+    description:"Calculate average of array elements.",
+    code:`public class Main {
+    public static void main(String[] args) {
+
+        int[] numbers = {10, 20, 30, 40, 50};
+
+        int sum = 0;
+
+        for (int n : numbers)
+            sum += n;
+
+        double average = (double) sum / numbers.length;
+
+        System.out.println("Average = " + average);
+    }
+}`
+},
+
+{
+    id:"java007",
+    icon:"🔎",
+    language:"Java",
+    title:"Linear Search",
+    category:"DSA",
+    description:"Search an element in an array.",
+    code:`public class Main {
+
+    public static void main(String[] args) {
+
+        int[] a = {10, 20, 30, 40, 50};
+        int key = 30;
+
+        boolean found = false;
+
+        for (int i = 0; i < a.length; i++) {
+
+            if (a[i] == key) {
+                System.out.println("Found at index " + i);
+                found = true;
+                break;
+            }
+        }
+
+        if (!found)
+            System.out.println("Not Found");
+    }
+}`
+},
+
+{
+    id:"java008",
+    icon:"↕️",
+    language:"Java",
+    title:"Bubble Sort",
+    category:"DSA",
+    description:"Sort an array using bubble sort.",
+    code:`public class Main {
+
+    public static void main(String[] args) {
+
+        int[] a = {50, 20, 40, 10, 30};
+
+        for (int i = 0; i < a.length; i++) {
+
+            for (int j = 0; j < a.length - i - 1; j++) {
+
+                if (a[j] > a[j + 1]) {
+
+                    int temp = a[j];
+                    a[j] = a[j + 1];
+                    a[j + 1] = temp;
+                }
+            }
+        }
+
+        for (int x : a)
+            System.out.print(x + " ");
+    }
+}`
+},
+
+/* =========================================================
+   JAVASCRIPT - 6
+========================================================= */
+
+{
+    id:"js001",
+    icon:"⚡",
+    language:"JavaScript",
+    title:"Hello World",
+    category:"Basics",
+    description:"Basic JavaScript program.",
+    code:`console.log("Hello, World!");`
+},
+
+{
+    id:"js002",
+    icon:"➕",
+    language:"JavaScript",
+    title:"Arithmetic Operations",
+    category:"Basics",
+    description:"Perform arithmetic operations.",
+    code:`let a = 20;
+let b = 5;
+
+console.log("Addition:", a + b);
+console.log("Subtraction:", a - b);
+console.log("Multiplication:", a * b);
+console.log("Division:", a / b);`
+},
+
+{
+    id:"js003",
+    icon:"🔢",
+    language:"JavaScript",
+    title:"Even or Odd",
+    category:"Conditional",
+    description:"Check even or odd.",
+    code:`let n = 15;
+
+if (n % 2 === 0) {
+    console.log("Even Number");
+} else {
+    console.log("Odd Number");
+}`
+},
+
+{
+    id:"js004",
+    icon:"🔁",
+    language:"JavaScript",
+    title:"For Loop",
+    category:"Loops",
+    description:"Print numbers from 1 to 10.",
+    code:`for (let i = 1; i <= 10; i++) {
+    console.log(i);
+}`
+},
+
+{
+    id:"js005",
+    icon:"🌀",
+    language:"JavaScript",
+    title:"Fibonacci",
+    category:"Numbers",
+    description:"Generate Fibonacci series.",
+    code:`let n = 10;
+let a = 0;
+let b = 1;
+
+for (let i = 0; i < n; i++) {
+    console.log(a);
+
+    let c = a + b;
+    a = b;
+    b = c;
+}`
+},
+
+{
+    id:"js006",
+    icon:"📋",
+    language:"JavaScript",
+    title:"Array Methods",
+    category:"Arrays",
+    description:"Demonstrate common array methods.",
+    code:`let numbers = [10, 20, 30, 40];
+
+numbers.push(50);
+
+console.log("Array:", numbers);
+console.log("Length:", numbers.length);
+console.log("Maximum:", Math.max(...numbers));
+console.log("Minimum:", Math.min(...numbers));`
+},
+
+/* =========================================================
+   HTML - 4
+========================================================= */
+
+{
+    id:"html001",
+    icon:"🌐",
+    language:"HTML",
+    title:"Basic Webpage",
+    category:"HTML Basics",
+    description:"Create a simple webpage.",
+    code:`<!DOCTYPE html>
 <html>
-
 <head>
-    <title>My Page</title>
+    <title>My Webpage</title>
 </head>
 
 <body>
 
     <h1>Hello World</h1>
 
-    <p>Welcome to my website.</p>
+    <p>Welcome to my webpage.</p>
 
 </body>
-
 </html>`
-    },
+},
 
-
-    {
-        icon: "🎨",
-        language: "HTML",
-        title: "HTML + CSS",
-        description: "Create a colorful webpage.",
-        code:
-`<!DOCTYPE html>
-
+{
+    id:"html002",
+    icon:"📝",
+    language:"HTML",
+    title:"Student Profile",
+    category:"HTML Practical",
+    description:"Create a student profile page.",
+    code:`<!DOCTYPE html>
 <html>
-
 <head>
-
-<style>
-
-body {
-    background: #111;
-    color: white;
-    text-align: center;
-}
-
-h1 {
-    color: cyan;
-}
-
-</style>
-
+    <title>Student Profile</title>
 </head>
 
 <body>
 
-<h1>My Website</h1>
+    <h1>Student Profile</h1>
 
-<p>Hello!</p>
+    <h2>Student Name</h2>
+
+    <p>Branch: Computer Science</p>
+    <p>College Student</p>
+
+    <h3>Skills</h3>
+
+    <ul>
+        <li>Python</li>
+        <li>C</li>
+        <li>HTML</li>
+        <li>JavaScript</li>
+    </ul>
 
 </body>
-
 </html>`
-    },
+},
 
+{
+    id:"html003",
+    icon:"📋",
+    language:"HTML",
+    title:"Student Registration Form",
+    category:"Forms",
+    description:"Create a registration form.",
+    code:`<!DOCTYPE html>
+<html>
+<head>
+    <title>Registration Form</title>
+</head>
 
-    {
-        icon: "⚡",
-        language: "JavaScript",
-        title: "JavaScript Hello",
-        description: "Your first JavaScript program.",
-        code:
-`console.log("Hello, World!");`
-    },
+<body>
 
+<h1>Student Registration</h1>
 
-    {
-        icon: "➗",
-        language: "JavaScript",
-        title: "JavaScript Calculator",
-        description: "Perform basic arithmetic.",
-        code:
-`let a = 20;
-let b = 10;
+<form>
 
-console.log("Addition:", a + b);
-console.log("Subtraction:", a - b);
-console.log("Multiplication:", a * b);
-console.log("Division:", a / b);`
-    },
+    <label>Name:</label>
+    <input type="text"><br><br>
 
+    <label>Email:</label>
+    <input type="email"><br><br>
 
-    {
-        icon: "💻",
-        language: "C",
-        title: "C Hello World",
-        description: "Simple C program.",
-        code:
-`#include <stdio.h>
+    <label>Password:</label>
+    <input type="password"><br><br>
 
-int main() {
+    <label>Gender:</label>
 
-    printf("Hello, World!");
+    <input type="radio" name="gender"> Male
+    <input type="radio" name="gender"> Female
 
-    return 0;
-}`
-    },
+    <br><br>
 
+    <button type="submit">Register</button>
 
-    {
-        icon: "⚙️",
-        language: "C++",
-        title: "C++ Hello World",
-        description: "Simple C++ program.",
-        code:
-`#include <iostream>
+</form>
 
-using namespace std;
+</body>
+</html>`
+},
 
-int main() {
+{
+    id:"html004",
+    icon:"📊",
+    language:"HTML",
+    title:"Student Marks Table",
+    category:"Tables",
+    description:"Create a marks table.",
+    code:`<!DOCTYPE html>
+<html>
+<head>
+    <title>Marks Table</title>
+</head>
 
-    cout << "Hello, World!";
+<body>
 
-    return 0;
-}`
-    }
+<h1>Student Marks</h1>
 
+<table border="1">
+
+<tr>
+    <th>Name</th>
+    <th>Maths</th>
+    <th>Python</th>
+    <th>C</th>
+</tr>
+
+<tr>
+    <td>Student 1</td>
+    <td>85</td>
+    <td>90</td>
+    <td>88</td>
+</tr>
+
+<tr>
+    <td>Student 2</td>
+    <td>78</td>
+    <td>82</td>
+    <td>80</td>
+</tr>
+
+</table>
+
+</body>
+</html>`
+},
+
+/* =========================================================
+   SQL - 6
+========================================================= */
+
+{
+    id:"sql001",
+    icon:"🗄️",
+    language:"SQL",
+    title:"Create Table",
+    category:"SQL Basics",
+    description:"Create a student table.",
+    code:`CREATE TABLE students (
+    id INT,
+    name VARCHAR(50),
+    branch VARCHAR(50),
+    marks INT
+);`
+},
+
+{
+    id:"sql002",
+    icon:"➕",
+    language:"SQL",
+    title:"Insert Records",
+    category:"SQL Basics",
+    description:"Insert student records.",
+    code:`INSERT INTO students
+(id, name, branch, marks)
+VALUES
+(1, 'Student 1', 'CSE', 90);
+
+INSERT INTO students
+(id, name, branch, marks)
+VALUES
+(2, 'Student 2', 'AIML', 85);`
+},
+
+{
+    id:"sql003",
+    icon:"🔎",
+    language:"SQL",
+    title:"Select Records",
+    category:"Queries",
+    description:"Display student records.",
+    code:`SELECT *
+FROM students;`
+},
+
+{
+    id:"sql004",
+    icon:"📊",
+    language:"SQL",
+    title:"Average Marks",
+    category:"Aggregate Functions",
+    description:"Calculate average marks.",
+    code:`SELECT AVG(marks) AS average_marks
+FROM students;`
+},
+
+{
+    id:"sql005",
+    icon:"🏆",
+    language:"SQL",
+    title:"Highest Marks",
+    category:"Aggregate Functions",
+    description:"Find the highest marks.",
+    code:`SELECT MAX(marks) AS highest_marks
+FROM students;`
+},
+
+{
+    id:"sql006",
+    icon:"🔢",
+    language:"SQL",
+    title:"Count Students",
+    category:"Aggregate Functions",
+    description:"Count total students.",
+    code:`SELECT COUNT(*) AS total_students
+FROM students;`
+},
+
+/* =========================================================
+   R - 7
+========================================================= */
+
+{
+    id:"r001",
+    icon:"📊",
+    language:"R",
+    title:"Hello World",
+    category:"Basics",
+    description:"Basic R program.",
+    code:`print("Hello, World!")`
+},
+
+{
+    id:"r002",
+    icon:"➕",
+    language:"R",
+    title:"Arithmetic Operations",
+    category:"Basics",
+    description:"Perform arithmetic operations.",
+    code:`a <- 20
+b <- 5
+
+print(a + b)
+print(a - b)
+print(a * b)
+print(a / b)`
+},
+
+{
+    id:"r003",
+    icon:"📈",
+    language:"R",
+    title:"Mean Median Mode",
+    category:"Statistics",
+    description:"Calculate mean, median and mode.",
+    code:`x <- c(10, 20, 20, 30, 40)
+
+mean_value <- mean(x)
+median_value <- median(x)
+
+frequency <- table(x)
+mode_value <- names(frequency)[frequency == max(frequency)]
+
+print(paste("Mean:", mean_value))
+print(paste("Median:", median_value))
+print(paste("Mode:", mode_value))`
+},
+
+{
+    id:"r004",
+    icon:"📊",
+    language:"R",
+    title:"Standard Deviation",
+    category:"Statistics",
+    description:"Calculate standard deviation.",
+    code:`x <- c(10, 20, 30, 40, 50)
+
+result <- sd(x)
+
+print(paste("Standard Deviation:", result))`
+},
+
+{
+    id:"r005",
+    icon:"📈",
+    language:"R",
+    title:"Correlation Coefficient",
+    category:"Statistics",
+    description:"Calculate correlation coefficient.",
+    code:`x <- c(10, 20, 30, 40, 50)
+y <- c(12, 25, 28, 42, 55)
+
+r <- cor(x, y)
+
+print(paste("Correlation Coefficient:", r))`
+},
+
+{
+    id:"r006",
+    icon:"📉",
+    language:"R",
+    title:"Linear Regression",
+    category:"Statistics",
+    description:"Perform simple linear regression.",
+    code:`x <- c(1, 2, 3, 4, 5)
+y <- c(2, 4, 5, 4, 6)
+
+model <- lm(y ~ x)
+
+print(model)
+print(summary(model))`
+},
+
+{
+    id:"r007",
+    icon:"📊",
+    language:"R",
+    title:"Histogram",
+    category:"Data Visualization",
+    description:"Create a histogram.",
+    code:`marks <- c(45, 55, 60, 65, 70, 75, 80, 85, 90)
+
+hist(
+    marks,
+    main = "Student Marks",
+    xlab = "Marks"
+)`
+},
+
+/* =========================================================
+   BASH / UNIX - 5
+========================================================= */
+
+{
+    id:"sh001",
+    icon:"🐧",
+    language:"Bash",
+    title:"Hello World",
+    category:"Unix Basics",
+    description:"Basic shell script.",
+    code:`#!/bin/bash
+
+echo "Hello, World!"`
+},
+
+{
+    id:"sh002",
+    icon:"👤",
+    language:"Bash",
+    title:"Student Details",
+    category:"Unix Practical",
+    description:"Display student details using arguments.",
+    code:`#!/bin/bash
+
+echo "Name: $1"
+echo "Roll Number: $2"
+echo "Branch: $3"
+echo "Address: $4"`
+},
+
+{
+    id:"sh003",
+    icon:"🔢",
+    language:"Bash",
+    title:"Even or Odd",
+    category:"Unix Practical",
+    description:"Check even or odd number.",
+    code:`#!/bin/bash
+
+read -p "Enter number: " n
+
+if [ $((n % 2)) -eq 0 ]
+then
+    echo "Even Number"
+else
+    echo "Odd Number"
+fi`
+},
+
+{
+    id:"sh004",
+    icon:"➕",
+    language:"Bash",
+    title:"Sum of N Numbers",
+    category:"Unix Practical",
+    description:"Calculate sum from 1 to N.",
+    code:`#!/bin/bash
+
+read -p "Enter N: " n
+
+sum=0
+
+for ((i=1; i<=n; i++))
+do
+    sum=$((sum + i))
+done
+
+echo "Sum = $sum"`
+},
+
+{
+    id:"sh005",
+    icon:"🔍",
+    language:"Bash",
+    title:"Largest of Three",
+    category:"Unix Practical",
+    description:"Find largest of three numbers.",
+    code:`#!/bin/bash
+
+read -p "Enter first number: " a
+read -p "Enter second number: " b
+read -p "Enter third number: " c
+
+if [ $a -ge $b ] && [ $a -ge $c ]
+then
+    echo "Largest = $a"
+elif [ $b -ge $a ] && [ $b -ge $c ]
+then
+    echo "Largest = $b"
+else
+    echo "Largest = $c"
+fi`
+}
 
 ];
 
 
-/* =====================================
-   DISPLAY PROGRAMS
-===================================== */
+/* =========================================================
+   GLOBAL VARIABLES
+========================================================= */
 
-function displayPrograms(list = programs) {
+let currentModalProgram = null;
+
+
+/* =========================================================
+   ELEMENT HELPERS
+========================================================= */
+
+const $ = id => document.getElementById(id);
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+function initialize() {
+
+    $("totalPrograms").textContent = programs.length;
+    $("libraryCount").textContent = programs.length;
+
+    const languages =
+        [...new Set(programs.map(p => p.language))];
+
+    const categories =
+        [...new Set(programs.map(p => p.category))];
+
+    $("totalLanguages").textContent =
+        languages.length;
+
+    $("totalCategories").textContent =
+        categories.length;
+
+    populateLanguageFilter();
+
+    populateCategoryFilter();
+
+    displayPrograms(programs);
+}
+
+
+/* =========================================================
+   LANGUAGE FILTER
+========================================================= */
+
+function populateLanguageFilter() {
+
+    const select = $("languageFilter");
+
+    const languages =
+        [...new Set(programs.map(p => p.language))]
+        .sort();
+
+    select.innerHTML =
+        `<option value="all">🌐 All Languages</option>`;
+
+    languages.forEach(language => {
+
+        const option =
+            document.createElement("option");
+
+        option.value = language;
+
+        option.textContent =
+            getLanguageIcon(language) + " " + language;
+
+        select.appendChild(option);
+    });
+}
+
+
+/* =========================================================
+   CATEGORY FILTER
+========================================================= */
+
+function populateCategoryFilter() {
+
+    const language =
+        $("languageFilter").value;
+
+    const current =
+        $("categoryFilter").value;
+
+    const filtered =
+        language === "all"
+            ? programs
+            : programs.filter(
+                p => p.language === language
+            );
+
+    const categories =
+        [...new Set(
+            filtered.map(p => p.category)
+        )].sort();
+
+    const select =
+        $("categoryFilter");
+
+    select.innerHTML =
+        `<option value="all">📚 All Categories</option>`;
+
+    categories.forEach(category => {
+
+        const option =
+            document.createElement("option");
+
+        option.value = category;
+
+        option.textContent =
+            category;
+
+        select.appendChild(option);
+    });
+
+    if (categories.includes(current)) {
+        select.value = current;
+    }
+}
+
+
+/* =========================================================
+   LANGUAGE ICON
+========================================================= */
+
+function getLanguageIcon(language) {
+
+    const icons = {
+
+        Python:"🐍",
+        C:"💻",
+        "C++":"⚙️",
+        Java:"☕",
+        JavaScript:"⚡",
+        HTML:"🌐",
+        SQL:"🗄️",
+        R:"📊",
+        Bash:"🐧"
+
+    };
+
+    return icons[language] || "💻";
+}
+
+
+/* =========================================================
+   FILTER PROGRAMS
+========================================================= */
+
+function filterPrograms() {
+
+    const language =
+        $("languageFilter").value;
+
+    const category =
+        $("categoryFilter").value;
+
+    const search =
+        $("programSearch")
+        .value
+        .toLowerCase()
+        .trim();
+
+
+    /* Update categories when language changes */
+
+    populateCategoryFilter();
+
+
+    const filtered =
+        programs.filter(program => {
+
+            const languageMatch =
+                language === "all" ||
+                program.language === language;
+
+            const categoryMatch =
+                category === "all" ||
+                program.category === category;
+
+            const searchMatch =
+
+                program.title
+                    .toLowerCase()
+                    .includes(search)
+
+                ||
+
+                program.description
+                    .toLowerCase()
+                    .includes(search)
+
+                ||
+
+                program.language
+                    .toLowerCase()
+                    .includes(search)
+
+                ||
+
+                program.category
+                    .toLowerCase()
+                    .includes(search);
+
+            return (
+                languageMatch &&
+                categoryMatch &&
+                searchMatch
+            );
+        });
+
+
+    displayPrograms(filtered);
+}
+
+
+/* =========================================================
+   DISPLAY PROGRAMS
+========================================================= */
+
+function displayPrograms(list) {
 
     const grid =
-        document.getElementById("programGrid");
-
+        $("programGrid");
 
     grid.innerHTML = "";
+
+
+    $("visibleCount").textContent =
+        list.length;
 
 
     if (list.length === 0) {
 
         grid.innerHTML = `
 
-            <div style="
-                grid-column:1/-1;
-                text-align:center;
-                padding:40px;
-                color:#64748b;
-            ">
+            <div class="empty-state">
 
-                <h3>No programs found 🔎</h3>
+                <div class="empty-icon">
+                    🔎
+                </div>
+
+                <h3>
+                    No programs found
+                </h3>
 
                 <p>
-                    Try another search.
+                    Try another program,
+                    language or category.
                 </p>
 
             </div>
@@ -1342,11 +3548,10 @@ function displayPrograms(list = programs) {
     }
 
 
-    list.forEach((program, index) => {
+    list.forEach(program => {
 
         const card =
-            document.createElement("div");
-
+            document.createElement("article");
 
         card.className =
             "program-card";
@@ -1355,228 +3560,456 @@ function displayPrograms(list = programs) {
         card.innerHTML = `
 
             <div class="program-icon">
-
                 ${program.icon}
+            </div>
+
+            <h3>
+                ${escapeHtml(program.title)}
+            </h3>
+
+            <p>
+                ${escapeHtml(program.description)}
+            </p>
+
+            <div class="tags">
+
+                <span class="tag">
+                    ${escapeHtml(program.language)}
+                </span>
+
+                <span class="tag category">
+                    ${escapeHtml(program.category)}
+                </span>
 
             </div>
 
+            <div class="card-actions">
 
-            <h3>
+                <button
+                    class="card-btn"
+                    onclick="openCode('${program.id}')">
 
-                ${program.title}
+                    👁 View Code
 
-            </h3>
+                </button>
 
+                <button
+                    class="card-btn copy-btn"
+                    onclick="copyProgram('${program.id}')">
 
-            <p>
+                    📋 Copy
 
-                ${program.description}
+                </button>
 
-            </p>
-
-
-            <small style="
-                color:#6366f1;
-                display:block;
-                margin-top:10px;
-            ">
-
-                ${program.language}
-
-            </small>
-
-
-            <button
-                onclick="copyProgram(${index})">
-
-                📋 Copy Code
-
-            </button>
-
+            </div>
         `;
 
 
         grid.appendChild(card);
-
     });
-
 }
 
 
-/* =====================================
-   SEARCH PROGRAMS
-===================================== */
+/* =========================================================
+   HTML ESCAPE
+========================================================= */
 
-function searchPrograms() {
+function escapeHtml(value) {
 
-    const search =
-        document
-            .getElementById("programSearch")
-            .value
-            .toLowerCase();
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
 
 
-    const filtered =
-        programs.filter(program =>
+/* =========================================================
+   OPEN CODE MODAL
+========================================================= */
 
-            program.title
-                .toLowerCase()
-                .includes(search)
+function openCode(id) {
 
-            ||
-
-            program.language
-                .toLowerCase()
-                .includes(search)
-
-            ||
-
-            program.description
-                .toLowerCase()
-                .includes(search)
-
+    const program =
+        programs.find(
+            p => p.id === id
         );
 
 
-    displayPrograms(filtered);
+    if (!program) {
 
+        showToast(
+            "Program not found ❌"
+        );
+
+        return;
+    }
+
+
+    currentModalProgram =
+        program;
+
+
+    $("modalIcon").textContent =
+        program.icon;
+
+    $("modalTitle").textContent =
+        program.title;
+
+    $("modalMeta").textContent =
+        `${program.language} • ${program.category}`;
+
+    $("codePreview").textContent =
+        program.code;
+
+
+    $("codeModal")
+        .classList
+        .add("show");
+
+
+    $("codeModal")
+        .setAttribute(
+            "aria-hidden",
+            "false"
+        );
 }
 
 
-/* =====================================
-   COPY PROGRAM
-===================================== */
+/* =========================================================
+   CLOSE MODAL
+========================================================= */
 
-function copyProgram(index) {
+function closeCode() {
+
+    $("codeModal")
+        .classList
+        .remove("show");
+
+    $("codeModal")
+        .setAttribute(
+            "aria-hidden",
+            "true"
+        );
+
+    currentModalProgram = null;
+}
+
+
+/* =========================================================
+   COPY TEXT
+========================================================= */
+
+async function copyText(text) {
+
+    try {
+
+        if (
+            navigator.clipboard &&
+            window.isSecureContext
+        ) {
+
+            await navigator.clipboard
+                .writeText(text);
+
+            return true;
+        }
+
+
+        const textarea =
+            document.createElement("textarea");
+
+        textarea.value = text;
+
+        textarea.style.position =
+            "fixed";
+
+        textarea.style.opacity =
+            "0";
+
+        document.body.appendChild(
+            textarea
+        );
+
+        textarea.focus();
+
+        textarea.select();
+
+        const success =
+            document.execCommand("copy");
+
+        textarea.remove();
+
+        return success;
+
+    } catch (error) {
+
+        return false;
+    }
+}
+
+
+/* =========================================================
+   COPY PROGRAM
+========================================================= */
+
+async function copyProgram(id) {
 
     const program =
-        programs[index];
+        programs.find(
+            p => p.id === id
+        );
 
 
-    navigator.clipboard
-        .writeText(program.code)
-        .then(() => {
+    if (!program) {
 
-            showToast(
-                `${program.title} code copied! ✅`
-            );
+        showToast(
+            "Program not found ❌"
+        );
 
-        })
-        .catch(() => {
+        return;
+    }
 
-            showToast(
-                "Unable to copy code."
-            );
 
-        });
+    const success =
+        await copyText(program.code);
 
+
+    if (success) {
+
+        showToast(
+            `${program.title} code copied! ✅`
+        );
+
+    } else {
+
+        showToast(
+            "Unable to copy code ❌"
+        );
+    }
 }
 
 
-/* =====================================
+/* =========================================================
+   COPY MODAL CODE
+========================================================= */
+
+async function copyModalCode() {
+
+    if (!currentModalProgram)
+        return;
+
+
+    const success =
+        await copyText(
+            currentModalProgram.code
+        );
+
+
+    if (success) {
+
+        $("modalCopyBtn")
+            .textContent =
+            "✅ Copied!";
+
+
+        showToast(
+            "Code copied successfully!"
+        );
+
+
+        setTimeout(() => {
+
+            $("modalCopyBtn")
+                .textContent =
+                "📋 Copy Code";
+
+        }, 1500);
+
+    } else {
+
+        showToast(
+            "Unable to copy code ❌"
+        );
+    }
+}
+
+
+/* =========================================================
+   CLEAR FILTERS
+========================================================= */
+
+function clearFilters() {
+
+    $("programSearch").value =
+        "";
+
+    $("languageFilter").value =
+        "all";
+
+    populateCategoryFilter();
+
+    $("categoryFilter").value =
+        "all";
+
+    displayPrograms(programs);
+
+    showToast(
+        "Filters cleared ✨"
+    );
+}
+
+
+/* =========================================================
    TOAST
-===================================== */
+========================================================= */
+
+let toastTimer;
 
 function showToast(message) {
 
     const toast =
-        document.getElementById("toast");
-
+        $("toast");
 
     toast.textContent =
         message;
 
-
     toast.classList.add("show");
 
 
-    setTimeout(() => {
+    clearTimeout(toastTimer);
 
-        toast.classList.remove("show");
 
-    }, 2500);
+    toastTimer =
+        setTimeout(() => {
 
+            toast.classList.remove(
+                "show"
+            );
+
+        }, 2500);
 }
 
 
-/* =====================================
-   RELOAD COMPILER
-===================================== */
+/* =========================================================
+   COMPILER REFRESH
+========================================================= */
 
 function reloadEditor() {
 
     const iframe =
-        document.getElementById("compiler");
+        $("compiler");
 
 
     iframe.src =
-        iframe.src;
+        "https://onecompiler.com/embed/?listenToEvents=true&refresh="
+        + Date.now();
 
 
     showToast(
         "Compiler refreshed 🔄"
     );
-
 }
 
 
-/* =====================================
-   NEW FILE
-===================================== */
+/* =========================================================
+   NEW COMPILER SESSION
+========================================================= */
 
 function newFile() {
 
     const iframe =
-        document.getElementById("compiler");
+        $("compiler");
 
-
-    /*
-       Because OneCompiler is loaded inside
-       a cross-origin iframe, this page cannot
-       directly delete its internal files.
-
-       Reloading gives the embedded compiler
-       a fresh session.
-    */
 
     iframe.src =
-        "https://onecompiler.com/embed/?listenToEvents=true";
+        "https://onecompiler.com/embed/?listenToEvents=true&new="
+        + Date.now();
 
 
     showToast(
         "New compiler session opened 📄"
     );
-
 }
 
 
-/* =====================================
+/* =========================================================
    FULLSCREEN
-===================================== */
+========================================================= */
 
 function goFullScreen() {
 
     const editor =
-        document.getElementById("editor");
+        $("editor");
+
+
+    if (document.fullscreenElement) {
+
+        document.exitFullscreen();
+
+        return;
+    }
 
 
     if (editor.requestFullscreen) {
 
         editor.requestFullscreen();
 
-    }
+        showToast(
+            "Fullscreen mode enabled ⛶"
+        );
 
+    } else {
+
+        showToast(
+            "Fullscreen is not supported ❌"
+        );
+    }
 }
 
 
-/* =====================================
-   START
-===================================== */
+/* =========================================================
+   SCROLL TO PROGRAMS
+========================================================= */
 
-displayPrograms();
+function scrollToPrograms() {
+
+    $("programSection")
+        .scrollIntoView({
+            behavior:"smooth"
+        });
+}
+
+
+/* =========================================================
+   ESCAPE KEY
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key === "Escape" &&
+            $("codeModal")
+                .classList
+                .contains("show")
+        ) {
+
+            closeCode();
+        }
+    }
+);
+
+
+/* =========================================================
+   START APPLICATION
+========================================================= */
+
+initialize();
 
 </script>
-
 
 </body>
 </html>
